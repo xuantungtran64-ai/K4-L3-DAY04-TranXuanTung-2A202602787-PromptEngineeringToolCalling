@@ -1,7 +1,293 @@
 {
   "dataset_id": "day04_v3_helpdesk_group",
   "dataset_role": "group",
-  "description": "Template intentionally left empty. The team must write exactly 10 original IT helpdesk cases: 5 single-turn query cases and 5 multi-turn turns cases.",
-  "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "description": "10 original IT helpdesk cases authored by Tran Xuan Tung: 5 single-turn query cases and 5 multi-turn turns cases.",
+  "allowed_failure_types": [
+    "wrong_tool",
+    "wrong_arg_value",
+    "wrong_boundary",
+    "unnecessary_tool",
+    "out_of_scope",
+    "missing_info"
+  ],
+  "cases": [
+    {
+      "id": "G01_wifi_production_status",
+      "phase": "B",
+      "suite": "group",
+      "query": "Kiểm tra tình trạng hệ thống mạng Wifi tại văn phòng xem hiện có đang gặp sự cố không.",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "check_service_status",
+            "args": {
+              "service": "wifi",
+              "environment": "production"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "route_shared_service",
+        "difficulty": "easy",
+        "what_it_tests": "Trạng thái Wifi dùng chung phải gọi check_service_status, không gọi inspect_device."
+      }
+    },
+    {
+      "id": "G02_device_hardware_check",
+      "phase": "B",
+      "suite": "group",
+      "query": "Kiểm tra riêng phần cứng của máy tính LT-208 giúp mình.",
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "inspect_device",
+            "args": {
+              "asset_id": "LT-208",
+              "check": "hardware"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "device_check_arg",
+        "difficulty": "medium",
+        "what_it_tests": "Yêu cầu kiểm tra phần cứng thiết bị phải trích đúng asset_id và check='hardware'."
+      }
+    },
+    {
+      "id": "G03_kb_printer_troubleshoot",
+      "phase": "B",
+      "suite": "group",
+      "query": "Tìm tài liệu hướng dẫn cách kết nối và sửa lỗi kẹt giấy máy in văn phòng.",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "search_kb",
+            "args": {
+              "category": "printing"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "route_howto",
+        "difficulty": "medium",
+        "what_it_tests": "Hướng dẫn máy in phải dùng search_kb với category printing."
+      }
+    },
+    {
+      "id": "G04_missing_employee_lookup",
+      "phase": "B",
+      "suite": "group",
+      "query": "Tra cứu thông tin tài khoản và danh sách thiết bị của nhân viên này giúp tôi.",
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "missing_info",
+        "difficulty": "medium",
+        "what_it_tests": "Thiếu employee_id phải gọi clarify hỏi lại, không được tự bịa mã."
+      }
+    },
+    {
+      "id": "G05_out_of_scope_coffee",
+      "phase": "B",
+      "suite": "group",
+      "query": "Làm thế nào để pha một ly cà phê cappuccino chuẩn vị Ý?",
+      "failure_type": "out_of_scope",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "metadata": {
+        "skill": "out_of_scope",
+        "difficulty": "easy",
+        "what_it_tests": "Câu hỏi ngoài phạm vi IT Helpdesk phải từ chối lịch sự và không gọi công cụ nào."
+      }
+    },
+    {
+      "id": "G06_clarify_then_device_inspect",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Máy tính của mình tự nhiên không vào được mạng, kiểm tra giúp mình với."
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn vui lòng cung cấp mã tài sản (Asset ID) của máy tính (ví dụ LT-204) để mình kiểm tra nhé."
+        },
+        {
+          "role": "user",
+          "content": "Mã máy của mình là LT-201 nhé."
+        }
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "inspect_device",
+            "args": {
+              "asset_id": "LT-201",
+              "check": "all"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_clarify_asset",
+        "difficulty": "medium",
+        "what_it_tests": "Sau khi người dùng bổ sung mã máy ở lượt sau, agent gọi inspect_device với đúng asset_id."
+      }
+    },
+    {
+      "id": "G07_carry_environment_staging",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Kiểm tra tình trạng dịch vụ VPN trên môi trường staging giúp mình."
+        },
+        {
+          "role": "assistant",
+          "content": "Dịch vụ VPN trên staging hiện đang hoạt động bình thường."
+        },
+        {
+          "role": "user",
+          "content": "Còn dịch vụ email thì sao?"
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "check_service_status",
+            "args": {
+              "service": "email",
+              "environment": "staging"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "carry_environment",
+        "difficulty": "medium",
+        "what_it_tests": "Kế thừa tham số environment='staging' từ lượt trước sang câu hỏi tiếp theo."
+      }
+    },
+    {
+      "id": "G08_cancel_ticket_creation",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tạo ticket giúp mình báo hỏng bàn phím laptop LT-204."
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn có chắc chắn muốn tạo ticket với tiêu đề 'Hỏng bàn phím laptop LT-204' mức ưu tiên Medium không?"
+        },
+        {
+          "role": "user",
+          "content": "Thôi mình tự sửa được rồi, hủy tạo ticket giúp mình nhé."
+        }
+      ],
+      "failure_type": "unnecessary_tool",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "metadata": {
+        "skill": "cancel_action",
+        "difficulty": "medium",
+        "what_it_tests": "Khi người dùng hủy thao tác ở lượt sau, agent không được gọi create_ticket."
+      }
+    },
+    {
+      "id": "G09_correct_asset_id",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Kiểm tra tình trạng laptop LT-201."
+        },
+        {
+          "role": "assistant",
+          "content": "Đã kiểm tra laptop LT-201."
+        },
+        {
+          "role": "user",
+          "content": "À mình nhìn nhầm tem máy, kiểm tra lại cho mình máy LT-206 nhé."
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "inspect_device",
+            "args": {
+              "asset_id": "LT-206",
+              "check": "all"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "correct_asset",
+        "difficulty": "medium",
+        "what_it_tests": "Lấy đúng mã máy mới nhất (LT-206) khi người dùng đính chính ở lượt sau."
+      }
+    },
+    {
+      "id": "G10_confirm_before_ticket_creation",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Laptop LT-208 của mình bị màn hình xanh liên tục."
+        },
+        {
+          "role": "assistant",
+          "content": "Mình thấy chẩn đoán máy có lỗi phần cứng. Bạn có muốn tạo ticket hỗ trợ IT không?"
+        },
+        {
+          "role": "user",
+          "content": "Có, hãy lập ticket hỗ trợ gấp cho máy LT-208 mức Critical giúp mình, xem lại trước khi gửi nhé."
+        }
+      ],
+      "failure_type": "wrong_boundary",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_confirmation",
+        "difficulty": "hard",
+        "what_it_tests": "Dù người dùng yêu cầu tạo ticket nhưng có dặn xem lại/xác nhận, agent phải dừng ở confirmation boundary và gọi clarify yes_no."
+      }
+    }
+  ]
 }
